@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Texas Worksheet Generator — custom styles ─────────────────────────── */
+
+[x-cloak] { display: none !important; }
+
+@keyframes pulse-scale {
+  0%,100% { opacity:.4; transform: scale(.92); }
+  50%      { opacity:1;  transform: scale(1);   }
+}
+.anim-pulse { animation: pulse-scale 2s ease-in-out infinite; }
+
+@keyframes bar-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%);  }
+}
+.anim-bar   { animation: bar-slide 1.6s ease-in-out infinite; }
+.anim-bar-d1 { animation-delay: .0s; }
+.anim-bar-d2 { animation-delay: .25s; }
+.anim-bar-d3 { animation-delay: .5s; }
+
+.q-card { transition: box-shadow .2s, transform .2s; }
+.q-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+
+.answer-line { border-bottom: 1.5px solid #cbd5e1; height: 2rem; margin-top: .5rem; }
+
+@page { size: letter; margin: .75in; }
+@media print {
+  .no-print          { display: none !important; }
+  .print-only        { display: block !important; }
+  header, nav        { display: none !important; }
+  .view-config       { display: none !important; }
+  .view-loading      { display: none !important; }
+  body               { background: white !important; }
+  .worksheet-paper   { box-shadow: none !important; border-radius: 0 !important; margin: 0 !important; page-break-inside: avoid; }
+  .q-card            { page-break-inside: avoid; box-shadow: none !important; margin-bottom: 1rem; }
+  .answer-key-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  a                  { text-decoration: none; }
+}
+
+.hero-bg {
+  background-color: #00205B;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Level badge styles */
+.level-approaching { background: linear-gradient(135deg, #0d9488, #0891b2); }
+.level-advanced    { background: linear-gradient(135deg, #ea580c, #d97706); }
+.level-gt          { background: linear-gradient(135deg, #7c3aed, #4f46e5); }

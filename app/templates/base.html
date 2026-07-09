@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{% block description %}Generate Texas TEKS-aligned worksheets for any grade, subject, topic, and level instantly.{% endblock %}" />
+  <title>{% block title %}Texas Worksheet Generator – TEKS Aligned{% endblock %}</title>
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="./static/css/app.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  {% block head %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-slate-50 font-sans antialiased" {% block body_attrs %}{% endblock %}>
+
+<noscript>
+  <div style="background:#BF0A30;color:white;padding:1rem;text-align:center;font-family:sans-serif;">
+    JavaScript is required to use the Texas Worksheet Generator. Please enable JavaScript in your browser.
+  </div>
+</noscript>
+
+  <!-- ── NAVIGATION (shared chrome) ─────────────────────────────────────── -->
+  <header class="no-print bg-tx-navy text-white shadow-lg sticky top-0 z-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-tx-gold rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+          <span class="text-tx-navy font-black text-base leading-none select-none" aria-hidden="true">★</span>
+        </div>
+        <div>
+          <span class="font-bold text-sm sm:text-base leading-none tracking-tight">Texas Worksheet Generator</span>
+          <span class="hidden sm:block text-blue-300 text-xs leading-none mt-0.5">TEKS-Aligned Educational Content</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        {% block header_actions %}{% endblock %}
+        <a href="https://lab.kudithipudi.org" class="text-blue-200 hover:text-white text-sm transition whitespace-nowrap">&larr; lab.kudithipudi.org</a>
+      </div>
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <!-- ── FOOTER (shared chrome) ─────────────────────────────────────────── -->
+  <footer class="no-print border-t border-slate-200 bg-white py-6 mt-8">
+    <p class="text-center text-xs text-slate-400">
+      Part of the <a href="https://lab.kudithipudi.org/" class="text-tx-navy hover:underline font-medium">Kudithipudi AI Lab</a>
+    </p>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+  <script defer src="./static/js/alpinejs-3.14.1.min.js"></script>
+</body>
+</html>

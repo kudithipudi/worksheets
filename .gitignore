@@ -1,43 +1,11 @@
-# Environment & secrets
-.env
-.env.*
-!.env.example
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.py[cod]
-*$py.class
 venv/
-.venv/
-env/
-ENV/
-*.egg-info/
-*.egg
-build/
-dist/
-
-# SQLite databases
-*.db
-*.sqlite
-*.sqlite3
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Logs
+__pycache__/
+*.py[cod]
+*.sock
+data/
 *.log
-logs/
-
-# Uploads/generated
-uploads/
-static/images/generated/
+.env
+htmlcov/
+.pytest_cache/
+nohup.out
+gunicorn.pid

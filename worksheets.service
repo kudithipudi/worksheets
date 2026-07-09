@@ -11,20 +11,17 @@ User=www-data
 Group=www-data
 WorkingDirectory=/var/www/worksheets
 
-# Load secrets / config from .env
-EnvironmentFile=/var/www/worksheets/.env
-
-# Use the virtualenv gunicorn
+# Use the virtualenv gunicorn; the app reads .env itself (pydantic-settings)
 ExecStart=/var/www/worksheets/venv/bin/gunicorn \
-    --config /var/www/worksheets/gunicorn_config.py \
-    main:app
+    --config /var/www/worksheets/gunicorn.conf.py \
+    app.main:app
 
 ExecReload=/bin/kill -s HUP $MAINPID
 KillMode=mixed
 TimeoutStopSec=30
 
 # Restart policy
-Restart=on-failure
+Restart=always
 RestartSec=5
 StartLimitIntervalSec=60
 StartLimitBurst=3
