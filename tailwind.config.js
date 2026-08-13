@@ -1,16 +1,10 @@
 /** @type {import('tailwindcss').Config} */
+/* Restyled to the lab slate/indigo palette (pretty-print reference):
+ * indigo-600 primary, slate base, default sans stack. */
 module.exports = {
   content: ["./app/templates/**/*.html"],
   theme: {
-    extend: {
-      colors: {
-        'tx-navy':  '#00205B',
-        'tx-dnavy': '#001540',
-        'tx-red':   '#BF0A30',
-        'tx-gold':  '#D4AA3B',
-      },
-      fontFamily: { sans: ['"Inter"', 'system-ui', 'sans-serif'] },
-    },
+    extend: {},
   },
   plugins: [],
 };
