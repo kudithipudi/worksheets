@@ -4,6 +4,10 @@ import os
 
 import pytest
 
+from app.config import settings
+from app.models.orm import RateLimitHit
+from app.routers import worksheets as worksheets_router
+
 SKIP_LLM = bool(os.getenv("SKIP_LLM"))
 skip_llm_mark = pytest.mark.skipif(SKIP_LLM, reason="SKIP_LLM=1 set — skipping LLM call tests")
 
@@ -218,3 +222,39 @@ class TestAPIStats:
         assert data["total_questions"] >= 0
         assert data["vetted_questions"] >= 0
         assert data["flagged_questions"] >= 0
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Rate limiting on POST /api/generate
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestAPIRateLimit:
+
+    async def test_generate_rate_limited(
+        self, client, db_session, seed_question, valid_generate_payload, monkeypatch
+    ):
+        # Start from a clean slate regardless of hits accumulated by earlier tests.
+        db_session.query(RateLimitHit).delete()
+        db_session.commit()
+
+        # Force the cheap DB-sourcing path so this test never hits the paid LLM.
+        monkeypatch.setattr(worksheets_router, "VETTED_THRESHOLD", 0)
+        seed_question(
+            grade=valid_generate_payload["grade"],
+            subject=valid_generate_payload["subject"],
+            topic=valid_generate_payload["topic"],
+            level=valid_generate_payload["level"],
+            thumbs_up=1,
+        )
+
+        monkeypatch.setattr(settings, "rate_limit_per_minute", 2)
+
+        for _ in range(2):
+            r = await client.post("/api/generate", json=valid_generate_payload)
+            assert r.status_code == 200
+
+        r = await client.post("/api/generate", json=valid_generate_payload)
+        assert r.status_code == 429
+        assert r.json()["detail"] == (
+            "Too many requests — please slow down and try again in a minute."
+        )

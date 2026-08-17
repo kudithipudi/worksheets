@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.constants import FLAG_THRESHOLD, TOPICS_BY_SUBJECT, VALID_QUESTION_TYPES
-from app.db import get_db
+from app.db import check_and_record_rate_limit, get_db
 from app.services.llm import LLM_MODEL, _generate_from_llm
 from app.models import Question, GenerateRequest, QuestionOut, RateRequest, WorksheetOut
 
@@ -98,6 +98,16 @@ def _save_questions(
     return saved
 
 
+def _client_ip(request: Request) -> str:
+    fwd = request.headers.get("x-forwarded-for")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    real_ip = request.headers.get("x-real-ip")
+    if real_ip:
+        return real_ip
+    return request.client.host if request.client else "unknown"
+
+
 # ── Routes ─────────────────────────────────────────────────────────────────────
 
 @router.get("/", include_in_schema=False)
@@ -125,6 +135,7 @@ async def get_question_types():
 @router.post("/api/generate", response_model=WorksheetOut)
 async def generate_worksheet(
     req: GenerateRequest,
+    request: Request,
     db: Session = Depends(get_db),
 ):
     """
@@ -132,6 +143,19 @@ async def generate_worksheet(
       • vetted DB questions >= VETTED_THRESHOLD  → pull from library
       • vetted DB questions <  VETTED_THRESHOLD  → generate via LLM
     """
+    allowed = check_and_record_rate_limit(
+        db,
+        ip=_client_ip(request),
+        route="generate",
+        limit=settings.rate_limit_per_minute,
+        window_seconds=settings.rate_limit_window_seconds,
+    )
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many requests — please slow down and try again in a minute.",
+        )
+
     grade, subject, topic, level, count, question_types = (
         req.grade, req.subject, req.topic, req.level, req.count, req.question_types
     )

@@ -20,6 +20,11 @@ class Settings(BaseSettings):
     # ── Hybrid-sourcing threshold: use DB when >= N vetted questions exist ──
     vetted_threshold: int = 1000
 
+    # ── Rate limiting: per-IP cap on POST /api/generate (calls the paid ────
+    # OpenRouter API), enforced over a trailing window.
+    rate_limit_per_minute: int = 20
+    rate_limit_window_seconds: int = 60
+
     # ── Subpath deployment (behind nginx at /worksheets/) ──────────────────
     # NOTE: nginx's /worksheets/ location rewrites the prefix off the path
     # before proxying (rewrite ^/worksheets(/.*)$ $1 break;), so the app

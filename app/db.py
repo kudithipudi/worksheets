@@ -3,11 +3,13 @@ Database engine, session factory, and initialisation helpers.
 WAL mode is enabled for improved concurrent-read performance with SQLite.
 """
 
+from datetime import datetime, timedelta
+
 from sqlalchemy import create_engine, event, text
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import settings
-from app.models.orm import Base
+from app.models.orm import Base, RateLimitHit
 
 engine = create_engine(
     settings.database_url,
@@ -63,3 +65,36 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def check_and_record_rate_limit(
+    session: Session,
+    *,
+    ip: str,
+    route: str,
+    limit: int,
+    window_seconds: int,
+) -> bool:
+    """Record a hit for (ip, route) and return whether it's within `limit`
+    hits in the trailing `window_seconds`. Also prunes hits for this route
+    older than the window, so the table doesn't grow unbounded."""
+    cutoff = datetime.utcnow() - timedelta(seconds=window_seconds)
+    session.query(RateLimitHit).filter(
+        RateLimitHit.route == route,
+        RateLimitHit.created_at < cutoff,
+    ).delete(synchronize_session=False)
+    count = (
+        session.query(RateLimitHit)
+        .filter(
+            RateLimitHit.route == route,
+            RateLimitHit.ip == ip,
+            RateLimitHit.created_at >= cutoff,
+        )
+        .count()
+    )
+    if count >= limit:
+        session.commit()
+        return False
+    session.add(RateLimitHit(ip=ip, route=route))
+    session.commit()
+    return True

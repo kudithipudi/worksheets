@@ -9,3 +9,6 @@ htmlcov/
 .pytest_cache/
 nohup.out
 gunicorn.pid
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+graft/

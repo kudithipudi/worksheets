@@ -2,7 +2,9 @@
 SQLAlchemy ORM models for the Texas Worksheet Generator.
 """
 
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime
+from datetime import datetime
+
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, Index
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import func
 
@@ -63,3 +65,17 @@ class Question(Base):
             f"<Question id={self.id} grade={self.grade!r} "
             f"subject={self.subject!r} source={self.source!r}>"
         )
+
+
+class RateLimitHit(Base):
+    """One row per hit against a rate-limited route (sliding-window log)."""
+
+    __tablename__ = "rate_limit_hits"
+    __table_args__ = (
+        Index("idx_rate_limit_hits_route_ip_time", "route", "ip", "created_at"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    ip = Column(String(64), nullable=False)
+    route = Column(String(50), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
