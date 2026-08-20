@@ -3,16 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f8fafc" />
   <meta name="description" content="{% block description %}Generate Texas TEKS-aligned worksheets for any grade, subject, topic, and level instantly.{% endblock %}" />
   <title>{% block title %}Texas Worksheet Generator – TEKS Aligned{% endblock %}</title>
 
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="./static/css/app.css" />
 
+  <style>
+    /* Skip link — visible only on keyboard focus */
+    .skip-link {
+      position: absolute;
+      left: .5rem;
+      top: .5rem;
+      z-index: 60;
+      padding: .5rem .75rem;
+      border-radius: .5rem;
+      background: #fff;
+      color: #4338ca;
+      font-size: .875rem;
+      font-weight: 600;
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1);
+      transform: translateY(-200%);
+      transition: transform .15s ease-in-out;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    /* Sticky header + worksheet toolbar must not cover focused/anchored headings */
+    h1, h2, h3, #main { scroll-margin-top: 6rem; }
+
+    /* Remove double-tap zoom delay on interactive elements */
+    button, a, select, input, [role="button"] { touch-action: manipulation; }
+
+    /* Custom-count input: keyboard-only focus ring (no ring on click) */
+    #custom-count:focus-visible {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px #6366f1;
+    }
+
+    /* Stats modal + scroll list: don't let overscroll chain to the page behind */
+    .stats-modal, .stats-scroll-list { overscroll-behavior: contain; }
+
+    /* Headings: avoid widows */
+    h1, h2, h3 { text-wrap: balance; }
+
+    /* Progress bar animates width only (not transition-all) */
+    .stats-progress { transition: width .7s ease-in-out; }
+
+    /* Honor prefers-reduced-motion: stop infinite loops + Alpine view/modal transitions */
+    @media (prefers-reduced-motion: reduce) {
+      .anim-pulse, .anim-bar { animation: none !important; }
+      [x-transition], [x-transition\:enter], [x-transition\:leave] { transition: none !important; }
+    }
+  </style>
+
   {% block head %}{% endblock %}
 </head>
 
 <body class="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased" {% block body_attrs %}{% endblock %}>
+
+<a href="#main" class="skip-link">Skip to main content</a>
 
 <noscript>
   <div style="background:#4F46E5;color:white;padding:1rem;text-align:center;font-family:sans-serif;">
@@ -37,7 +88,9 @@
     </div>
   </header>
 
+  <main id="main" tabindex="-1">
   {% block content %}{% endblock %}
+  </main>
 
   <!-- ── FOOTER (shared chrome) ─────────────────────────────────────────── -->
   <footer class="no-print border-t border-slate-200 py-6 mt-10">

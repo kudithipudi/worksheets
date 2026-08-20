@@ -33,7 +33,7 @@
        x-transition:leave-end="opacity-0">
 
     <div class="hero-bg py-14 px-4 text-white text-center no-print">
-      <h2 class="text-3xl sm:text-4xl font-extrabold mb-3 tracking-tight">Generate Your Worksheet</h2>
+      <h1 class="text-3xl sm:text-4xl font-extrabold mb-3 tracking-tight">Generate Your Worksheet</h1>
       <p class="text-slate-300 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
         Instantly create print-ready, TEKS-aligned practice worksheets for any Texas grade, subject, topic, and level.
       </p>
@@ -43,7 +43,7 @@
       <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-100">
 
         <!-- Error alert -->
-        <div x-show="error" x-transition
+        <div x-show="error" x-transition x-ref="errorAlert" tabindex="-1"
              role="alert"
              aria-live="polite"
              class="mb-6 flex gap-3 p-4 bg-rose-50 border border-rose-200 rounded-lg text-sm text-rose-700">
@@ -57,7 +57,7 @@
         <div class="mb-5">
           <label for="grade-select" class="block text-sm font-semibold text-slate-700 mb-2">Grade Level</label>
           <div class="relative">
-            <select id="grade-select" x-model="grade"
+            <select id="grade-select" name="grade" x-model="grade" @change="_syncUrl()"
               class="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-300 rounded-xl
                      text-slate-900 font-medium appearance-none
                      focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition cursor-pointer">
@@ -83,7 +83,7 @@
                 :class="subject === s
                   ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
                   : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50'"
-                class="px-3 py-2.5 border-2 rounded-xl text-sm font-medium transition-all duration-150 text-center">
+                class="px-3 py-2.5 border-2 rounded-xl text-sm font-medium transition duration-150 text-center">
                 <span x-text="s"></span>
               </button>
             </template>
@@ -98,12 +98,12 @@
           </span>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" role="group" aria-labelledby="topic-label">
             <template x-for="t in topicsForSubject" :key="t">
-              <button @click="topic = t"
+              <button @click="topic = t; _syncUrl()"
                 :aria-pressed="topic === t"
                 :class="topic === t
                   ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
                   : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50'"
-                class="px-3 py-2.5 border-2 rounded-xl text-sm font-medium transition-all duration-150 text-left">
+                class="px-3 py-2.5 border-2 rounded-xl text-sm font-medium transition duration-150 text-left">
                 <span x-text="t"></span>
               </button>
             </template>
@@ -115,42 +115,42 @@
           <span id="level-label" class="block text-sm font-semibold text-slate-700 mb-2">Difficulty Level</span>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group" aria-labelledby="level-label">
             <!-- Approaching -->
-            <button @click="level = 'Approaching'"
+            <button @click="level = 'Approaching'; _syncUrl()"
               :aria-pressed="level === 'Approaching'"
               :class="level === 'Approaching'
                 ? 'level-approaching text-white border-teal-600 shadow-sm'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-teal-400 hover:text-teal-700 hover:bg-teal-50'"
-              class="px-4 py-3 border-2 rounded-xl text-sm font-medium transition-all duration-150 text-left">
+              class="px-4 py-3 border-2 rounded-xl text-sm font-medium transition duration-150 text-left">
               <div class="font-semibold">Approaching</div>
               <div class="text-xs mt-0.5 opacity-75">Scaffolded · simplified language</div>
             </button>
             <!-- On-Level -->
-            <button @click="level = 'On-Level'"
+            <button @click="level = 'On-Level'; _syncUrl()"
               :aria-pressed="level === 'On-Level'"
               :class="level === 'On-Level'
                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50'"
-              class="px-4 py-3 border-2 rounded-xl text-sm font-medium transition-all duration-150 text-left">
+              class="px-4 py-3 border-2 rounded-xl text-sm font-medium transition duration-150 text-left">
               <div class="font-semibold">On-Level</div>
               <div class="text-xs mt-0.5 opacity-75">Standard TEKS expectations</div>
             </button>
             <!-- Advanced -->
-            <button @click="level = 'Advanced'"
+            <button @click="level = 'Advanced'; _syncUrl()"
               :aria-pressed="level === 'Advanced'"
               :class="level === 'Advanced'
                 ? 'level-advanced text-white border-orange-600 shadow-sm'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-orange-400 hover:text-orange-700 hover:bg-orange-50'"
-              class="px-4 py-3 border-2 rounded-xl text-sm font-medium transition-all duration-150 text-left">
+              class="px-4 py-3 border-2 rounded-xl text-sm font-medium transition duration-150 text-left">
               <div class="font-semibold">Advanced</div>
               <div class="text-xs mt-0.5 opacity-75">Multi-step · STAAR-style</div>
             </button>
             <!-- GT/Enrichment -->
-            <button @click="level = 'GT/Enrichment'"
+            <button @click="level = 'GT/Enrichment'; _syncUrl()"
               :aria-pressed="level === 'GT/Enrichment'"
               :class="level === 'GT/Enrichment'
                 ? 'level-gt text-white border-violet-600 shadow-sm'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-violet-400 hover:text-violet-700 hover:bg-violet-50'"
-              class="px-4 py-3 border-2 rounded-xl text-sm font-medium transition-all duration-150 text-left">
+              class="px-4 py-3 border-2 rounded-xl text-sm font-medium transition duration-150 text-left">
               <div class="font-semibold">GT/Enrichment</div>
               <div class="text-xs mt-0.5 opacity-75">Novel application · synthesis</div>
             </button>
@@ -167,7 +167,7 @@
               :class="isMixed
                 ? 'bg-indigo-600 text-white border-indigo-600'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50'"
-              class="px-3 py-1.5 border-2 rounded-full text-xs font-semibold transition-all duration-150">
+              class="px-3 py-1.5 border-2 rounded-full text-xs font-semibold transition duration-150">
               Mixed (All)
             </button>
             <template x-for="qt in allQuestionTypes" :key="qt">
@@ -176,7 +176,7 @@
                 :class="selectedQuestionTypes.includes(qt) && !isMixed
                   ? 'bg-indigo-100 text-indigo-800 border-indigo-400'
                   : 'bg-white text-slate-500 border-slate-200 hover:border-indigo-300 hover:text-indigo-700 hover:bg-indigo-50'"
-                class="px-3 py-1.5 border-2 rounded-full text-xs font-medium transition-all duration-150">
+                class="px-3 py-1.5 border-2 rounded-full text-xs font-medium transition duration-150">
                 <span x-text="qt"></span>
               </button>
             </template>
@@ -193,7 +193,7 @@
                 :class="!customCount && questionCount === preset
                   ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
                   : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50'"
-                class="px-5 py-2 border-2 rounded-xl text-sm font-semibold transition-all duration-150 min-w-[3rem] text-center"
+                class="px-5 py-2 border-2 rounded-xl text-sm font-semibold transition duration-150 min-w-[3rem] text-center"
                 :x-text="preset">
               </button>
             </template>
@@ -202,15 +202,14 @@
               :class="customCount
                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50'"
-              class="px-5 py-2 border-2 rounded-xl text-sm font-semibold transition-all duration-150">
+              class="px-5 py-2 border-2 rounded-xl text-sm font-semibold transition duration-150">
               Custom
             </button>
             <div x-show="customCount" x-transition class="flex items-center gap-2">
               <label for="custom-count" class="sr-only">Custom question count</label>
-              <input id="custom-count" type="number" x-model.number="questionCount"
-                min="1" max="30" step="1"
-                class="w-20 px-3 py-2 border-2 border-indigo-600 rounded-xl text-sm font-bold text-slate-900 text-center
-                       focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+              <input id="custom-count" name="question_count" type="number" x-model.number="questionCount"
+                min="1" max="30" step="1" autocomplete="off" @change="_syncUrl()"
+                class="w-20 px-3 py-2 border-2 border-indigo-600 rounded-xl text-sm font-bold text-slate-900 text-center" />
               <span class="text-xs text-slate-400">questions (max 30)</span>
             </div>
             <span x-show="!customCount" class="text-2xl font-extrabold text-slate-900 tabular-nums ml-2" x-text="questionCount" aria-live="polite"></span>
@@ -220,7 +219,7 @@
         <!-- ── Generate ── -->
         <button @click="generateWorksheet()"
           class="group w-full bg-indigo-600 hover:bg-indigo-500 active:scale-[.98]
-                 text-white font-bold py-4 rounded-xl text-base transition-all
+                 text-white font-bold py-4 rounded-xl text-base transition
                  duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                class="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" aria-hidden="true">
@@ -457,7 +456,7 @@
                         'bg-white text-slate-500 border-slate-200 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200': ratings[q.id] === undefined,
                         'bg-white text-slate-300 border-slate-100': ratings[q.id] !== undefined && ratings[q.id] !== 'up'
                       }"
-                      class="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-xs transition-all disabled:cursor-default">
+                      class="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-xs transition disabled:cursor-default">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5" aria-hidden="true">
                         <path d="M1 8.25a1.25 1.25 0 112.5 0v7.5a1.25 1.25 0 11-2.5 0v-7.5zM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0114 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 01-1.341 5.974C17.153 16.323 16.22 17 15.21 17H12c-.47 0-.923-.17-1.275-.476l-2.652-2.652A.75.75 0 018 13.225V9.5a.75.75 0 01.75-.75h1.75A.75.75 0 0011 8V3z"/>
                       </svg>
@@ -468,7 +467,7 @@
                     <template x-if="ratings[q.id] === undefined && !pendingReason[q.id]">
                       <button @click="pendingReason = {...pendingReason, [q.id]: true}"
                         :aria-label="'Flag question ' + (idx+1) + ' as needs work'"
-                        class="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-xs transition-all
+                        class="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-xs transition
                                bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5" aria-hidden="true">
                           <path d="M18.905 12.75a1.25 1.25 0 01-2.5 0v-7.5a1.25 1.25 0 112.5 0v7.5zM8.905 17v1.3c0 .268-.14.526-.395.607A2 2 0 015.905 17c0-.995.182-1.948.514-2.826.204-.54-.166-1.174-.744-1.174h-2.52c-1.243 0-2.261-1.01-2.146-2.247.193-2.08.652-4.082 1.341-5.974C2.752 3.678 3.685 3 4.695 3H8.405c.47 0 .923.17 1.275.476l2.652 2.652A.75.75 0 0112.655 6.775V10.5a.75.75 0 01-.75.75H10.155a.75.75 0 00-.75.75v2.5z"/>
@@ -504,13 +503,13 @@
                       <template x-for="reason in flagReasons" :key="reason">
                         <button @click="submitDownRating(q.id, reason)"
                           class="px-3 py-1.5 bg-white border border-red-200 rounded-full text-xs text-red-700
-                                 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all font-medium"
+                                 hover:bg-red-600 hover:text-white hover:border-red-600 transition font-medium"
                           x-text="reason">
                         </button>
                       </template>
                       <button @click="pendingReason = {...pendingReason, [q.id]: false}"
                         class="px-3 py-1.5 bg-white border border-slate-200 rounded-full text-xs text-slate-500
-                               hover:bg-slate-100 transition-all">
+                               hover:bg-slate-100 transition">
                         Cancel
                       </button>
                     </div>
@@ -527,7 +526,7 @@
           <p class="text-[11px] text-slate-400">
             Texas Worksheet Generator &nbsp;·&nbsp; TEKS-Aligned
             <span x-text="worksheet?.generated_at
-              ? '  ·  ' + new Date(worksheet.generated_at).toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})
+              ? '  ·  ' + new Date(worksheet.generated_at).toLocaleDateString(locale, {year:'numeric',month:'long',day:'numeric'})
               : ''"></span>
           </p>
         </div>
@@ -538,22 +537,26 @@
 
 
   <!-- ── STATS MODAL ────────────────────────────────────────────────────── -->
-  <div x-show="showStats" x-cloak
-       class="no-print fixed inset-0 z-50 flex items-center justify-center p-4"
+  <div x-show="showStats" x-cloak x-ref="statsModal"
+       class="stats-modal no-print fixed inset-0 z-50 flex items-center justify-center p-4"
        x-transition:enter="transition ease-out duration-200"
        x-transition:enter-start="opacity-0"
        x-transition:enter-end="opacity-100"
+       @keydown.escape.window="closeStats()"
+       @keydown.tab="trapFocus($event)"
        role="dialog"
        aria-modal="true"
        aria-labelledby="stats-modal-title">
-    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showStats = false"></div>
+    <button type="button" tabindex="-1" aria-label="Close Question Bank"
+      class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm cursor-pointer"
+      @click="closeStats()"></button>
     <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100">
       <div class="flex items-center justify-between mb-5">
         <h3 id="stats-modal-title" class="text-lg font-bold text-slate-900">Question Bank</h3>
-        <button @click="showStats = false"
+        <button @click="closeStats()" x-ref="statsClose"
           aria-label="Close Question Bank"
           class="text-slate-400 hover:text-slate-600 transition rounded-lg p-1 hover:bg-slate-100">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5" aria-hidden="true">
@@ -566,7 +569,7 @@
           <!-- Empty state -->
           <template x-if="stats.total_questions === 0">
             <div class="py-6 text-center text-slate-500 text-sm">
-              <div class="text-4xl mb-3">📚</div>
+              <div class="text-4xl mb-3" aria-hidden="true">📚</div>
               <p class="font-semibold text-slate-700 mb-1">Coming Soon</p>
               <p class="text-slate-400 text-xs">The Question Bank grows as teachers rate more worksheets. Generate and rate questions to build the library!</p>
             </div>
@@ -590,15 +593,15 @@
               <div class="mb-5">
                 <div class="flex justify-between text-xs text-slate-500 mb-1">
                   <span>Vetted toward AI-bypass threshold</span>
-                  <span class="font-semibold" x-text="stats.vetted_questions + ' / 1,000'"></span>
+                  <span class="font-semibold" x-text="stats.vetted_questions.toLocaleString() + ' / ' + (1000).toLocaleString()"></span>
                 </div>
                 <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div class="h-full bg-indigo-600 rounded-full transition-all duration-700"
+                  <div class="h-full bg-indigo-600 rounded-full stats-progress"
                        :style="'width:' + Math.min(100, (stats.vetted_questions / 1000) * 100) + '%'"></div>
                 </div>
               </div>
               <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">By Grade &amp; Subject</h4>
-              <div class="max-h-52 overflow-y-auto space-y-1 pr-1">
+              <div class="stats-scroll-list max-h-52 overflow-y-auto space-y-1 pr-1">
                 <template x-for="[key, count] in Object.entries(stats.by_grade_subject ?? {}).sort((a,b) => b[1] - a[1])" :key="key">
                   <div class="flex items-center justify-between py-1.5 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition text-sm">
                     <span class="text-slate-700" x-text="key"></span>
@@ -649,6 +652,7 @@
           'Formatting worksheet…',
         ],
         _loadingTimer: null,
+        _lastFocused:  null,
 
         flagReasons: ['Off-standard', 'Unclear wording', 'Wrong difficulty', 'Incorrect answer'],
 
@@ -698,26 +702,32 @@
               }
             }
           } catch (_) {}
+          this._applyUrlParams();
+          window.addEventListener('popstate', () => this._onPopState());
         },
 
         setSubject(s) {
           this.subject = s;
           const topics = this.topicsBySubject[s] || [];
           this.topic = topics[0] || '';
+          this._syncUrl();
         },
 
         setCountPreset(n) {
           this.questionCount = n;
           this.customCount = false;
+          this._syncUrl();
         },
 
         enableCustomCount() {
           this.customCount = true;
+          this._syncUrl();
         },
 
         toggleMixed() {
           this.isMixed = true;
           this.selectedQuestionTypes = [];
+          this._syncUrl();
         },
 
         toggleQuestionType(qt) {
@@ -729,10 +739,16 @@
           } else {
             this.selectedQuestionTypes = [...this.selectedQuestionTypes, qt];
           }
+          this._syncUrl();
         },
 
         get activeQuestionTypes() {
           return this.isMixed ? ['Mixed'] : this.selectedQuestionTypes;
+        },
+
+        get locale() {
+          if (navigator.languages && navigator.languages.length) return navigator.languages;
+          return navigator.language || 'en-US';
         },
 
         _startLoadingTimer() {
@@ -771,6 +787,7 @@
           this.ratings     = {};
           this.pendingReason = {};
           this.showAnswers = false;
+          this._syncUrl();
           this._startLoadingTimer();
 
           try {
@@ -795,12 +812,17 @@
             this.worksheet = await res.json();
             this._stopLoadingTimer();
             this.view = 'worksheet';
+            this._syncUrl('push');
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
           } catch (err) {
             this._stopLoadingTimer();
             this.error = err.message;
             this.view  = 'config';
+            this._syncUrl();
+            this.$nextTick(() => {
+              if (this.$refs.errorAlert && this.error) this.$refs.errorAlert.focus();
+            });
           }
         },
 
@@ -834,12 +856,65 @@
         async fetchStats() {
           this.stats     = null;
           this.showStats = true;
+          this._lastFocused = document.activeElement;
+          document.body.style.overflow = 'hidden';
+          this._setModalInert(true);
+          this.$nextTick(() => {
+            if (this.$refs.statsClose) this.$refs.statsClose.focus();
+          });
           try {
             const res = await fetch('./api/stats');
             if (res.ok) this.stats = await res.json();
           } catch (_) {
-            this.showStats = false;
+            this.closeStats();
           }
+        },
+
+        closeStats() {
+          if (!this.showStats) return;
+          this.showStats = false;
+          this._setModalInert(false);
+          document.body.style.overflow = '';
+          if (this._lastFocused && typeof this._lastFocused.focus === 'function') {
+            this._lastFocused.focus();
+          }
+          this._lastFocused = null;
+        },
+
+        trapFocus(e) {
+          if (!this.showStats || !this.$refs.statsModal) return;
+          const focusables = this.$refs.statsModal.querySelectorAll(
+            'button:not([disabled]):not([tabindex="-1"]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusables.length === 0) return;
+          const first = focusables[0];
+          const last  = focusables[focusables.length - 1];
+          const inside = this.$refs.statsModal.contains(document.activeElement);
+          if (e.shiftKey) {
+            if (!inside || document.activeElement === first) {
+              e.preventDefault();
+              last.focus();
+            }
+          } else {
+            if (!inside || document.activeElement === last) {
+              e.preventDefault();
+              first.focus();
+            }
+          }
+        },
+
+        _setModalInert(on) {
+          const modal = this.$refs.statsModal;
+          if (!modal) return;
+          const apply = (el) => {
+            if (el === modal) return;
+            if (el.contains && el.contains(modal)) {
+              Array.from(el.children).forEach(apply);
+              return;
+            }
+            el.inert = on;
+          };
+          Array.from(document.body.children).forEach(apply);
         },
 
         printWorksheet() { window.print(); },
@@ -851,7 +926,57 @@
           this.pendingReason = {};
           this.showAnswers = false;
           this.error       = null;
+          this._syncUrl('push');
           window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+
+        _syncUrl(mode) {
+          try {
+            const p = new URLSearchParams();
+            p.set('view', this.view);
+            p.set('grade', this.grade);
+            p.set('subject', this.subject);
+            p.set('topic', this.topic);
+            p.set('level', this.level);
+            p.set('count', String(this.questionCount));
+            const url = window.location.pathname + '?' + p.toString();
+            const fn = mode === 'push' ? 'pushState' : 'replaceState';
+            history[fn](null, '', url);
+          } catch (_) {}
+        },
+
+        _applyUrlParams(p) {
+          try {
+            p = p || new URLSearchParams(window.location.search);
+            if (p.get('grade') && this.grades.includes(p.get('grade'))) this.grade = p.get('grade');
+            if (p.get('subject') && this.subjects.includes(p.get('subject'))) {
+              this.subject = p.get('subject');
+              const topics = this.topicsBySubject[this.subject] || [];
+              if (p.get('topic') && topics.includes(p.get('topic'))) this.topic = p.get('topic');
+            }
+            const validLevels = ['Approaching', 'On-Level', 'Advanced', 'GT/Enrichment'];
+            if (p.get('level') && validLevels.includes(p.get('level'))) this.level = p.get('level');
+            const c = parseInt(p.get('count'), 10);
+            if (!isNaN(c) && c >= 1 && c <= 30) {
+              this.questionCount = c;
+              if (![5, 10, 15, 20].includes(c)) this.customCount = true;
+            }
+          } catch (_) {}
+        },
+
+        _onPopState() {
+          try {
+            const p = new URLSearchParams(window.location.search);
+            this._applyUrlParams(p);
+            const ws = this.worksheet;
+            if (p.get('view') === 'worksheet' && ws
+                && ws.grade === p.get('grade') && ws.subject === p.get('subject')
+                && ws.topic === p.get('topic') && ws.level === p.get('level')) {
+              this.view = 'worksheet';
+            } else {
+              this.view = 'config';
+            }
+          } catch (_) {}
         },
       };
     }
